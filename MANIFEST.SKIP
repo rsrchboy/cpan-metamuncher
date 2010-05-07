@@ -1,0 +1,7 @@
+CPAN-MetaMuncher-*.
+blib
+MANIFEST.SKIP
+\.git
+\.bak$
+\.old$
+^Makefile$
