@@ -15,7 +15,7 @@ requires 'IPC::System::Simple';
 
 # min version for native traits
 requires 'Moose' => '0.90';
-#requires 'MooseX::Traits' => '0.08';
+requires 'MooseX::Traits' => '0.09';
 requires 'MooseX::Types';
 requires 'MooseX::Types::Path::Class';
 #requires 'MooseX::Types::URI';
