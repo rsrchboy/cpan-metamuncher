@@ -19,3 +19,4 @@ META.yml
 MYMETA.json
 t/00-load.t
 t/02-live.t
+t/10-traitfor-rpminfo.t
