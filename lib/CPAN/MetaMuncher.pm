@@ -77,13 +77,8 @@ sub _build__meta {
 # we handle all of the items with only one value via one hash, and let Moose
 # do the work by generating accessor methods.
 
-# FIXME NOTE here and below, we should probably use a method to return the
-# list rather than a lexical variable, so as to make it easier to inherit from
-# this class.
-
-my @scalars = qw{
-    abstract distribution_type generated_by license name version
-};
+sub _scalars_list { qw{ abstract distribution_type generated_by license name version } }
+my @scalars = __PACKAGE__->_scalars_list;
 
 has _scalars => (
     traits => ['Hash'], is => 'ro', isa => 'HashRef[Str]', lazy_build => 1,
@@ -98,9 +93,8 @@ sub _build__scalars { [ shift->_meta->{@scalars} ] }
 
 # handle all data with one-level key/value pairs; e.g. requires.
 
-my @hashes = qw{
-    build_requires configure_requires requires
-};
+sub _hashes_list { qw{  build_requires configure_requires requires } }
+my @hashes = __PACKAGE__->_hashes_list;
 
 for my $hash (@hashes) {
 
@@ -129,7 +123,8 @@ for my $hash (@hashes) {
 # strings....  we might want to reevaluate this.
 
 # license handled separately
-my @resources = qw{ homepage bugtracker repository };
+sub _resources_list { qw{ homepage bugtracker repository } }
+my @resources = __PACKAGE__->_resources_list;
 
 has _resources => (
     traits => ['Hash'], is => 'ro', isa => 'HashRef[Str]', lazy_build => 1,
@@ -185,20 +180,44 @@ CPAN::MetaMuncher - Digest a META.yml
     use CPAN::MetaMuncher;
 
     # ...
-    my $mm = CPAN::MetaMuncher->new(module => $cpanplus_module);
+    my $mm = CPAN::MetaMuncher->new(module => $module_name);
 
+    # or, to apply CPAN::MetaMuncher::RPMInfo and get handy rpm methods
+    my $mmrpm = CPAN::MetaMuncher->with_traits('RPMInfo')->new(...);
+
+    # ...
 
 =head1 DESCRIPTION
 
 B<WARNING: This is VERY early code.>
 
-Also, these docs refer to an out-of-date interface :)
+An abstraction layer for META.yml, and possibly others.  Right now we support
+the META.yml spec 1.4, though this is likely to be expanded in the future.
 
-An abstraction layer for META.yml, and possibly others.
+=head1 TRAITSFOR
+
+This package can be composed with various traits to allow for additional
+functionality, etc.  (Note this is "traits" in the sense of "role layered on
+top of a concrete class" rather than "metaclass role"; see, e.g., the TraitFor
+packages for L<Catalyst>.)
+
+Traits for CPAN::MetaMuncher live under the CPAN::MetaMuncher::TraitsFor
+namespace.
+
+=head2 RPMInfo
+
+Additional methods to help construct dependency info in a way RPM can
+understand and use it.
+
+See L<CPAN::MetaMuncher::TraitsFor::RPMInfo> for details.
+
+=head1 METHODS
+
+TODO.
 
 =head1 SEE ALSO
 
-L<CPANPLUS::Backend>
+L<CPAN::Easy>
 
 =head1 AUTHOR
 
@@ -207,7 +226,7 @@ Chris Weyl  <cweyl@alumni.drew.edu>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+Copyright (c) 2009-2010 Chris Weyl <cweyl@alumni.drew.edu>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
