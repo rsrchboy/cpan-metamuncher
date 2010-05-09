@@ -1,0 +1,65 @@
+NAME
+    CPAN::MetaMuncher - Digest a META.yml
+
+SYNOPSIS
+        use CPAN::MetaMuncher;
+
+        # ...
+        my $mm = CPAN::MetaMuncher->new(module => $module_name);
+
+        # or, to apply CPAN::MetaMuncher::RPMInfo and get handy rpm methods
+        my $mmrpm = CPAN::MetaMuncher->with_traits('RPMInfo')->new(...);
+
+        # ...
+
+DESCRIPTION
+    WARNING: This is VERY early code.
+
+    An abstraction layer for META.yml, and possibly others. Right now we
+    support the META.yml spec 1.4, though this is likely to be expanded in
+    the future.
+
+TRAITSFOR
+    This package can be composed with various traits to allow for additional
+    functionality, etc. (Note this is "traits" in the sense of "role layered
+    on top of a concrete class" rather than "metaclass role"; see, e.g., the
+    TraitFor packages for Catalyst.)
+
+    Traits for CPAN::MetaMuncher live under the CPAN::MetaMuncher::TraitsFor
+    namespace.
+
+  RPMInfo
+    Additional methods to help construct dependency info in a way RPM can
+    understand and use it.
+
+    See CPAN::MetaMuncher::TraitsFor::RPMInfo for details.
+
+METHODS
+    TODO.
+
+SEE ALSO
+    CPAN::Easy
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2009-2010 Chris Weyl <cweyl@alumni.drew.edu>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the terms of the GNU Lesser General Public License as published by
+    the Free Software Foundation; either version 2.1 of the License, or (at
+    your option) any later version.
+
+    This library is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser
+    General Public License for more details.
+
+    You should have received a copy of the GNU Lesser General Public License
+    along with this library; if not, write to the
+
+        Free Software Foundation, Inc.
+        59 Temple Place, Suite 330
+        Boston, MA  02111-1307  USA
+

@@ -7,6 +7,9 @@ all_from 'lib/CPAN/MetaMuncher.pm';
 author   'Chris Weyl <cweyl@alumni.drew.edu>';
 license  'lgpl';
 
+readme_from 'lib/CPAN/MetaMuncher.pm';
+readme_markdown_from 'lib/CPAN/MetaMuncher.pm';
+
 requires 'autodie';
 requires 'namespace::autoclean';
 
