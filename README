@@ -19,6 +19,14 @@ DESCRIPTION
     support the META.yml spec 1.4, though this is likely to be expanded in
     the future.
 
+"GENERIC" METHODS
+  has_meta_key
+  meta_entry_for
+  meta_keys
+    Returns a list of all keys used by this META.yml.
+
+  num_meta_keys
+  has_meta_keys
 TRAITSFOR
     This package can be composed with various traits to allow for additional
     functionality, etc. (Note this is "traits" in the sense of "role layered
@@ -33,9 +41,6 @@ TRAITSFOR
     understand and use it.
 
     See CPAN::MetaMuncher::TraitsFor::RPMInfo for details.
-
-METHODS
-    TODO.
 
 SEE ALSO
     CPAN::Easy

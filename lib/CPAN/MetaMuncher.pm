@@ -28,7 +28,7 @@ has '+_trait_namespace' => (default => 'CPAN::MetaMuncher::TraitFor');
 use CPAN::Easy;
 use Path::Class;
 
-our $VERSION = '0.007_01';
+our $VERSION = '0.007_02';
 
 # debugging
 #use Smart::Comments '###', '####';
@@ -59,7 +59,17 @@ after BUILDARGS => sub {
 # pretty simplistic -- CPAN::Easy does most of the work here if we're passed
 # a module, otherwise we just load and parse from the filename.
 
-has _meta => (is => 'ro', lazy_build => 1, isa => 'HashRef');
+has _meta => (
+    traits => ['Hash'], is => 'ro', lazy_build => 1, isa => 'HashRef',
+    handles => {
+        has_meta_key   => 'exists',
+        meta_entry_for => 'get',
+
+        meta_keys     => 'keys',
+        num_meta_keys => 'count',
+        has_meta_keys => 'count',
+    },
+);
 
 sub _build__meta {
     my $self = shift @_;
@@ -194,6 +204,20 @@ B<WARNING: This is VERY early code.>
 An abstraction layer for META.yml, and possibly others.  Right now we support
 the META.yml spec 1.4, though this is likely to be expanded in the future.
 
+=head1 "GENERIC" METHODS
+
+=head2 has_meta_key
+
+=head2 meta_entry_for
+
+=head2 meta_keys
+
+Returns a list of all keys used by this META.yml.
+
+=head2 num_meta_keys
+
+=head2 has_meta_keys
+
 =head1 TRAITSFOR
 
 This package can be composed with various traits to allow for additional
@@ -211,9 +235,6 @@ understand and use it.
 
 See L<CPAN::MetaMuncher::TraitsFor::RPMInfo> for details.
 
-=head1 METHODS
-
-TODO.
 
 =head1 SEE ALSO
 

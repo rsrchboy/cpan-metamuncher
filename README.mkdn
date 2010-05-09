@@ -21,6 +21,20 @@ __WARNING: This is VERY early code.__
 An abstraction layer for META.yml, and possibly others.  Right now we support
 the META.yml spec 1.4, though this is likely to be expanded in the future.
 
+# "GENERIC" METHODS
+
+## has_meta_key
+
+## meta_entry_for
+
+## meta_keys
+
+Returns a list of all keys used by this META.yml.
+
+## num_meta_keys
+
+## has_meta_keys
+
 # TRAITSFOR
 
 This package can be composed with various traits to allow for additional
@@ -38,9 +52,7 @@ understand and use it.
 
 See [CPAN::MetaMuncher::TraitsFor::RPMInfo](http://search.cpan.org/perldoc?CPAN::MetaMuncher::TraitsFor::RPMInfo) for details.
 
-# METHODS
 
-TODO.
 
 # SEE ALSO
 

@@ -1,12 +1,11 @@
 #############################################################################
 #
-# Digest a META.yml so we can get at the good parts easily :)
+# RPM-specific routines for CPAN::MetaMuncher
 #
 # Author:  Chris Weyl (cpan:RSRCHBOY), <cweyl@alumni.drew.edu>
 # Company: No company, personal work
-# Created: 05/11/2009 11:32:18 PM PDT
 #
-# Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+# Copyright (c) 2009-2010 Chris Weyl <cweyl@alumni.drew.edu>
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -19,11 +18,9 @@ package CPAN::MetaMuncher::TraitFor::RPMInfo;
 
 use Moose::Role;
 use namespace::autoclean;
+use Carp;
 
-use MooseX::Types::Moose       ':all';
-use MooseX::Types::Path::Class ':all';
-
-our $VERSION = '0.007_01';
+our $VERSION = '0.007_02';
 
 # debugging
 #use Smart::Comments '###', '####';
@@ -32,22 +29,22 @@ our $VERSION = '0.007_01';
 # RPM requires/needs
 
 has _rpm_build_requires => (
-    metaclass => 'Collection::ImmutableHash',
+    traits => ['Hash'], is => 'ro', isa => 'HashRef[Str]', lazy_build => 1,
 
-    is         => 'ro',
-    isa        => 'HashRef[Str]',
-    lazy_build => 1,
-
-    provides => {
+    handles => {
         #'' => '_rpm_build_requires',
-        'count'  => 'num_rpm_build_requires',
-        'empty'  => 'has_any_rpm_build_requires',
-        'exists' => 'has_rpm_br_on',
-        'keys'   => 'rpm_build_requires',
-        'get'    => 'rpm_build_require_version',
-        'kv'     => 'rpm_build_requires_kv_pairs',
+        num_rpm_build_requires      => 'count',
+        no_rpm_build_requires       => 'is_empty',
+        has_any_rpm_build_requires  => 'count',
+        has_rpm_build_requires      => 'count',
+        has_rpm_br_on               => 'exists',
+        rpm_build_requires          => 'keys',
+        rpm_build_require_version   => 'get',
+        rpm_build_requires_kv_pairs => 'kv',
 
-        elements => 'full_rpm_build_requires',
+        # huh?! make sure we're not actually trying to use this somewhere and
+        # remove
+        full_rpm_build_requires => 'elements',
     },
 );
 
@@ -57,29 +54,33 @@ sub _build__rpm_build_requires {
     );
 }
 
+before has_any_rpm_build_requires => sub {
+
+    carp 'has_any_rpm_build_requires is depreciated; '
+       . 'use has_rpm_build_requires instead!';
+};
+
 has _rpm_requires => (
-    metaclass => 'Collection::ImmutableHash',
+    traits => ['Hash'], is => 'ro', isa => 'HashRef[Str]', lazy_build => 1,
 
-    is         => 'ro',
-    isa        => 'HashRef[Str]',
-    lazy_build => 1,
-
-    provides => {
+    handles => {
         #'' => '_rpm_build_requires',
-        'count'  => 'num_rpm_requires',
-        'empty'  => 'has_rpm_requires',
-        'exists' => 'has_rpm_require_on',
-        'keys'   => 'rpm_requires',
-        'get'    => 'rpm_require_version',
-        'kv'     => 'rpm_requires_kv_pairs',
+        num_rpm_requires      => 'count',
+        no_rpm_requires       => 'is_empty',
+        has_any_rpm_requires  => 'count',
+        has_rpm_requires      => 'count',
+        has_rpm_require_on    => 'exists',
+        rpm_requires          => 'keys',
+        rpm_require_version   => 'get',
+        rpm_requires_kv_pairs => 'kv',
 
-        elements => 'full_rpm_requires',
+        # huh?! make sure we're not actually trying to use this somewhere and
+        # remove
+        full_rpm_requires => 'elements',
     },
 );
 
-sub _build__rpm_requires {
-    shift->_rpm_requires_from_meta_keys('requires')
-}
+sub _build__rpm_requires { shift->_rpm_requires_from_meta_keys('requires') }
 
 sub _rpm_requires_from_meta_keys {
     my $self = shift @_;
@@ -89,8 +90,8 @@ sub _rpm_requires_from_meta_keys {
     BR_LOOP:
     for my $key (@keys) {
 
-        next BR_LOOP unless exists $self->_meta->[0]->{$key};
-        my %more = %{ $self->_meta->[0]->{$key} };
+        next BR_LOOP unless $self->has_meta_key($key);
+        my %more = %{ $self->meta_value_for($key) };
         $req{"perl($_)"} = $more{$_} foreach keys %more;
         #%req = (%req, %more);
     }
@@ -109,36 +110,80 @@ __END__
 
 =head1 NAME
 
-CPAN::MetaMuncher - Digest a META.yml
+CPAN::MetaMuncher - Generate RPM-specific dependency information
 
 =head1 SYNOPSIS
 
     use CPAN::MetaMuncher;
 
     # ...
-    my $mm = CPAN::MetaMuncher->new(module => $cpanplus_module);
+    my $mm = CPAN::MetaMuncher->with_traits('RPMInfo')->new(module => "Some::Name");
 
 
 =head1 DESCRIPTION
 
 B<WARNING: This is VERY early code.>
 
-Also, these docs refer to an out-of-date interface :)
+This trait adds methods and attributes to L<CPAN::MetaMuncher> that
+generate RPM-specific metadata information.  If you're writing something that
+wants to examine CPAN/Perl dependencies against an RPM-managed system or needs
+to express dependencies in a way RPM will understand it, then this trait is
+for you.
 
-An abstraction layer for META.yml, and possibly others.
+=head1 BUILD REQUIRES
+
+In brief, build requires are generated by looking at the requires,
+configure_requires, and build_requires values.
+
+=head2 num_rpm_build_requires
+
+=head2 no_rpm_build_requires
+
+=head2 has_rpm_build_requires
+
+=head2 has_any_rpm_build_requires
+
+Depreciated legacy alias for has_rpm_build_requires.  Don't use this :)
+
+=head2 has_rpm_br_on
+
+=head2 rpm_build_requires
+
+=head2 rpm_build_require_version
+
+=head2 rpm_build_requires_kv_pairs
+
+=head1 REQUIRES
+
+In brief, requires are generated by looking at the requires values.
+
+=head2 num_rpm_requires
+
+=head2 no_rpm_requires
+
+=head2 has_any_rpm_requires
+
+=head2 has_rpm_requires
+
+=head2 has_rpm_require_on
+
+=head2 rpm_requires
+
+=head2 rpm_require_version
+
+=head2 rpm_requires_kv_pairs
 
 =head1 SEE ALSO
 
-L<CPANPLUS::Backend>
+L<CPAN::MetaMuncher>
 
 =head1 AUTHOR
 
-Chris Weyl  <cweyl@alumni.drew.edu>
-
+Chris Weyl <cweyl@alumni.drew.edu>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2009 Chris Weyl <cweyl@alumni.drew.edu>
+Copyright (c) 2009-2010 Chris Weyl <cweyl@alumni.drew.edu>
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public
