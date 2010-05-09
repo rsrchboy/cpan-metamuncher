@@ -1,0 +1,12 @@
+Changes to CPAN-MetaMuncher
+
+0.007_02 09 May 2010
+- add some native trait magic to _meta
+- drop the remaining MX::AH bits
+- some additional documentation
+- fixup RPMInfo trait
+    - native traits vs attributehandlers
+    - 
+
+0.007_01 08 May 2010
+- initial dev release to the cpan
